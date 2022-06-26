@@ -1,46 +1,49 @@
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Game {
   
-  private List<Player> registered = new ArrayList<>();
+  private Map<String, Player> registered = new HashMap();
   
   public void register(Player newPlayer) {
-    registered.add(newPlayer);
+    registered.put(newPlayer.getName(), newPlayer);
   }
   
   public Player findByName(String name) {
-    for (Player player : registered) {
-      if (player.getName().equals(name)) {
-        return player;
-      }
+    if (registered.containsKey(name)) {
+      return registered.get(name);
     }
     return null;
   }
   
   public int round(String playerName1, String playerName2) {
-    Player player1 = findByName(playerName1);
-    Player player2 = findByName(playerName2);
     
-    if (!(registered.contains(player1) && registered.contains(player2))) {
+    if (!(registered.containsKey(playerName1) && registered.containsKey(playerName2))) {
       throw new NotRegisteredException("Один из игроков не зарегистрирован");
     }
-    
-    if (player1.getStrength() > player2.getStrength()) {
+    int strength1 = registered.get(playerName1).getStrength();
+    int strength2 = registered.get(playerName2).getStrength();
+    if (strength1 > strength2) {
       return 1;
     }
-    if (player1.getStrength() < player2.getStrength()) {
+    if (strength1 < strength2) {
       return 2;
     }
     return 0;
   }
   
   public void removeById(int id) {
-    registered.removeIf(element -> element.getId() == id);
+    for (String name : registered.keySet()) {
+      if (registered.get(name).getId() == id) {
+        registered.remove(name);
+      }
+    }
   }
   
-  public List<Player> getPlayers() {
-    return registered;
+  public Player[] getPlayers() {
+    return registered.values().toArray(new Player[0]);
   }
   
 }
